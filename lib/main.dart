@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:geolocator/geolocator.dart';
+// import 'package:geolocator/geolocator.dart';
 
 void main() {
   runApp(const WeatherApp());
@@ -33,7 +33,7 @@ class WeatherScreen extends StatefulWidget {
 class _WeatherScreenState extends State<WeatherScreen> {
   double temperature = 0;
   bool isLoading = true;
-  String errorMessage = '';
+  // String errorMessage = '';
 
   @override
   void initState() {
@@ -41,72 +41,62 @@ class _WeatherScreenState extends State<WeatherScreen> {
     getWeather();
   }
 
-  // ignore: unused_element
-  Future<Position?> _determinePosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
+  // Future<Position?> _determinePosition() async {
+  //   bool serviceEnabled;
+  //   LocationPermission permission;
 
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (serviceEnabled) {
-      setState(() {
-        errorMessage = 'Location services are disabled, please enable them';
-      });
-      return null;
-    }
+  //   serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  //   if (serviceEnabled) {
+  //     setState(() {
+  //       errorMessage = 'Location services are disabled, please enable them';
+  //     });
+  //     return null;
+  //   }
 
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever) {
-      permission = await Geolocator.requestPermission();
-      setState(() {
-        errorMessage = 'Location Permissions are denied';
-      });
-      return null;
-    }
+  //   permission = await Geolocator.checkPermission();
+  //   if (permission == LocationPermission.denied ||
+  //       permission == LocationPermission.deniedForever) {
+  //     permission = await Geolocator.requestPermission();
+  //     setState(() {
+  //       errorMessage = 'Location Permissions are denied';
+  //     });
+  //     return null;
+  //   }
 
-    return await Geolocator.getCurrentPosition();
-    // Example coordinates for Jemo, Addis Ababa
-    // const lat = 8.9573906;
-    // const lon = 38.7220940;
-  }
+  //   return await Geolocator.getCurrentPosition();
+
+  // }
 
   Future<void> getWeather() async {
+// Example coordinates for Jemo, Addis Ababa
+    const double lat = 8.9573906;
+    const double lon = 38.7220940;
+
     setState(() {
       isLoading = true;
-      errorMessage = '';
+      // errorMessage = '';
     });
 
-    try {
-      final position = await _determinePosition();
+    // try {
+    //   final position = await _determinePosition();
 
-      if (position == null) {
-        setState(() {
-          isLoading = false;
-        });
-        return;
-      }
+    //   if (position == null) {
+    //     setState(() {
+    //       isLoading = false;
+    //     });
+    //     return;
+    //   }
 
-      final response = await http.get(
-        Uri.parse(
-          'https://api.open-meteo.com/v1/forecast?latitude=${position.latitude}&longitude=${position.longitude}&current_weather=true',
-        ),
-      );
+    final response = await http.get(
+      Uri.parse(
+        'https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&current_weather=true',
+      ),
+    );
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        setState(() {
-          temperature = data['current_weather']['temperature'];
-          isLoading = false;
-        });
-      } else {
-        setState(() {
-          errorMessage = 'Failed to fetch weather data';
-          isLoading = false;
-        });
-      }
-    } catch (e) {
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
       setState(() {
-        errorMessage = 'Error: $e';
+        temperature = data['current_weather']['temperature'];
         isLoading = false;
       });
     }
